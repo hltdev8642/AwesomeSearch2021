@@ -10,11 +10,21 @@ import Fuse from 'fuse.js';
 import {Route, withRouter} from 'react-router-dom';
 import Backdrop from '../../components/UI/Backdrop/Backdrop';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faBars} from '@fortawesome/free-solid-svg-icons';
+import {faBars, faCog, faFolder, faList, faDownload, faUpload} from '@fortawesome/free-solid-svg-icons';
 import classes from './AwesomeSearch.module.css';
 import {MdDarkMode, MdLightMode} from 'react-icons/md';
 
+// New feature imports
+import { CollectionManager } from '../../components/Collections';
+import { ListManager } from '../../components/ListManager';
+import { AIRecommendations } from '../../components/AI';
+import { SettingsPanel } from '../../components/Settings';
+import { ExportModal, ImportModal } from '../../components/ImportExport';
+import CollectionsContext from '../../context/CollectionsContext';
+
 class AwesomeSearch extends Component {
+    static contextType = CollectionsContext;
+    
     state = {
         errorMessage: null,
         subjects: null,
@@ -24,6 +34,11 @@ class AwesomeSearch extends Component {
         searchResult: [],
         showResult: false,
         showMenu: false,
+        // New feature state
+        activeView: 'search', // 'search' | 'collections' | 'lists'
+        showSettings: false,
+        showExport: false,
+        showImport: false,
     };
 
     getSubjectEntries = () => {
@@ -107,7 +122,32 @@ class AwesomeSearch extends Component {
         });
     };
 
+    // New feature handlers
+    setActiveView = (view) => {
+        this.setState({ activeView: view, showMenu: false });
+    };
+
+    toggleSettings = () => {
+        this.setState(prev => ({ showSettings: !prev.showSettings }));
+    };
+
+    toggleExport = () => {
+        this.setState(prev => ({ showExport: !prev.showExport }));
+    };
+
+    toggleImport = () => {
+        this.setState(prev => ({ showImport: !prev.showImport }));
+    };
+
+    handleAddToCollection = (item) => {
+        // This will be called from AIRecommendations to add items to a collection
+        console.log('Add to collection:', item);
+        // The actual logic is handled by the CollectionsContext
+    };
+
     render() {
+        const { activeView, showSettings, showExport, showImport } = this.state;
+        
         return (
             <div className={`${classes.AwesomeSearch} ${classes[this.props.theme]}`}>
                 <div className="grid">
@@ -126,6 +166,45 @@ class AwesomeSearch extends Component {
                             onClick={this.burgerButtonClickHandler}
                         >
                             <FontAwesomeIcon icon={faBars}/>
+                        </div>
+
+                        {/* New Feature Navigation */}
+                        <div className={classes.FeatureNav}>
+                            <button
+                                className={`${classes.NavButton} ${activeView === 'collections' ? classes.Active : ''}`}
+                                onClick={() => this.setActiveView('collections')}
+                                title="Collections"
+                            >
+                                <FontAwesomeIcon icon={faFolder} />
+                            </button>
+                            <button
+                                className={`${classes.NavButton} ${activeView === 'lists' ? classes.Active : ''}`}
+                                onClick={() => this.setActiveView('lists')}
+                                title="List Manager"
+                            >
+                                <FontAwesomeIcon icon={faList} />
+                            </button>
+                            <button
+                                className={classes.NavButton}
+                                onClick={this.toggleExport}
+                                title="Export"
+                            >
+                                <FontAwesomeIcon icon={faDownload} />
+                            </button>
+                            <button
+                                className={classes.NavButton}
+                                onClick={this.toggleImport}
+                                title="Import"
+                            >
+                                <FontAwesomeIcon icon={faUpload} />
+                            </button>
+                            <button
+                                className={classes.NavButton}
+                                onClick={this.toggleSettings}
+                                title="Settings"
+                            >
+                                <FontAwesomeIcon icon={faCog} />
+                            </button>
                         </div>
 
                         <div
@@ -149,53 +228,100 @@ class AwesomeSearch extends Component {
 
                 {this.state.subjects ? (
                     <div className="grid">
-                        <div
-                            className="cell -2of12"
-                            style={{
-                                width: '100%',
-                            }}
-                        >
-                            {this.state.showMenu ? (
-                                <AwesomeRwdMenu
+                        {/* Only show sidebar in search view */}
+                        {activeView === 'search' && (
+                            <div
+                                className="cell -2of12"
+                                style={{
+                                    width: '100%',
+                                }}
+                            >
+                                {this.state.showMenu ? (
+                                    <AwesomeRwdMenu
+                                        topics={Object.keys(this.state.subjects)}
+                                        topicOnClickHandler={this.topicOnClickHandler}
+                                    />
+                                ) : null}
+                                <AwesomeListMenu
                                     topics={Object.keys(this.state.subjects)}
                                     topicOnClickHandler={this.topicOnClickHandler}
                                 />
-                            ) : null}
-                            <AwesomeListMenu
-                                topics={Object.keys(this.state.subjects)}
-                                topicOnClickHandler={this.topicOnClickHandler}
-                            />
-                        </div>
+                            </div>
+                        )}
+                        
                         <div
-                            className="cell -10of12"
+                            className={activeView === 'search' ? 'cell -10of12' : 'cell -12of12'}
                             style={{
                                 width: '100%',
                             }}
                         >
-                            <Route
-                                path="/"
-                                exact
-                                render={() => {
-                                    return (
-                                        <AwesomeLists
-                                            topic={this.state.selectedSubject}
-                                            subjects={this.state.subjects[this.state.selectedSubject]}
+                            {/* Original Search View */}
+                            {activeView === 'search' && (
+                                <>
+                                    {/* AI Recommendations */}
+                                    {this.state.search && (
+                                        <AIRecommendations
+                                            query={this.state.search}
+                                            subjectsArray={this.state.subjectsArray}
+                                            onAddToCollection={this.handleAddToCollection}
                                         />
-                                    );
-                                }}
-                            />
-                            <Route
-                                path="/:user/:repo"
-                                render={(props) => {
-                                    return (
-                                        <AwesomeReadme
-                                            key={props.match.params.repo}
-                                            setMdHandler={this.setMdHandler}
-                                            {...props}
-                                        />
-                                    );
-                                }}
-                            />
+                                    )}
+                                    
+                                    <Route
+                                        path="/"
+                                        exact
+                                        render={() => {
+                                            return (
+                                                <AwesomeLists
+                                                    topic={this.state.selectedSubject}
+                                                    subjects={this.state.subjects[this.state.selectedSubject]}
+                                                />
+                                            );
+                                        }}
+                                    />
+                                    <Route
+                                        path="/:user/:repo"
+                                        render={(props) => {
+                                            return (
+                                                <AwesomeReadme
+                                                    key={props.match.params.repo}
+                                                    setMdHandler={this.setMdHandler}
+                                                    {...props}
+                                                />
+                                            );
+                                        }}
+                                    />
+                                </>
+                            )}
+
+                            {/* Collections View */}
+                            {activeView === 'collections' && (
+                                <div className={classes.FeatureView}>
+                                    <button 
+                                        className={classes.BackButton}
+                                        onClick={() => this.setActiveView('search')}
+                                    >
+                                        ← Back to Search
+                                    </button>
+                                    <CollectionManager />
+                                </div>
+                            )}
+
+                            {/* List Manager View */}
+                            {activeView === 'lists' && (
+                                <div className={classes.FeatureView}>
+                                    <button 
+                                        className={classes.BackButton}
+                                        onClick={() => this.setActiveView('search')}
+                                    >
+                                        ← Back to Search
+                                    </button>
+                                    <ListManager 
+                                        allLists={this.state.subjectsArray}
+                                        onRefresh={this.getSubjectEntries}
+                                    />
+                                </div>
+                            )}
                         </div>
 
                         <Backdrop
@@ -206,6 +332,24 @@ class AwesomeSearch extends Component {
                 ) : (
                     <Spinner/>
                 )}
+
+                {/* Modals */}
+                <SettingsPanel
+                    isOpen={showSettings}
+                    onClose={this.toggleSettings}
+                    onExport={this.toggleExport}
+                    onImport={this.toggleImport}
+                />
+
+                <ExportModal
+                    isOpen={showExport}
+                    onClose={this.toggleExport}
+                />
+
+                <ImportModal
+                    isOpen={showImport}
+                    onClose={this.toggleImport}
+                />
             </div>
         );
     }

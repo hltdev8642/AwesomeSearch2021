@@ -1,0 +1,162 @@
+.Button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.Button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Sizes */
+.small {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+.medium {
+  padding: 10px 18px;
+  font-size: 0.95rem;
+}
+
+.large {
+  padding: 14px 24px;
+  font-size: 1.1rem;
+}
+
+/* Variants */
+.primary {
+  background: #3498db;
+  color: white;
+}
+
+.primary:hover:not(:disabled) {
+  background: #2980b9;
+}
+
+.secondary {
+  background: #95a5a6;
+  color: white;
+}
+
+.secondary:hover:not(:disabled) {
+  background: #7f8c8d;
+}
+
+.success {
+  background: #27ae60;
+  color: white;
+}
+
+.success:hover:not(:disabled) {
+  background: #219a52;
+}
+
+.danger {
+  background: #e74c3c;
+  color: white;
+}
+
+.danger:hover:not(:disabled) {
+  background: #c0392b;
+}
+
+.warning {
+  background: #f39c12;
+  color: white;
+}
+
+.warning:hover:not(:disabled) {
+  background: #d68910;
+}
+
+.ghost {
+  background: transparent;
+  color: #3498db;
+  border: 1px solid #3498db;
+}
+
+.ghost:hover:not(:disabled) {
+  background: rgba(52, 152, 219, 0.1);
+}
+
+.outline {
+  background: transparent;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.outline:hover:not(:disabled) {
+  background: #f5f5f5;
+  border-color: #ccc;
+}
+
+.text {
+  background: transparent;
+  color: #3498db;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.text:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+/* Full width */
+.fullWidth {
+  width: 100%;
+}
+
+/* Loading state */
+.loading {
+  position: relative;
+}
+
+.loading .Text {
+  opacity: 0.7;
+}
+
+.Spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.Icon {
+  display: flex;
+  align-items: center;
+}
+
+/* Dark theme */
+:global(.solarized-dark) .outline {
+  color: #839496;
+  border-color: #586e75;
+}
+
+:global(.solarized-dark) .outline:hover:not(:disabled) {
+  background: rgba(131, 148, 150, 0.1);
+}
+
+:global(.solarized-dark) .ghost {
+  color: #268bd2;
+  border-color: #268bd2;
+}
+
+:global(.solarized-dark) .text {
+  color: #268bd2;
+}

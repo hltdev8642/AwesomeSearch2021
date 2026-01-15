@@ -14,7 +14,10 @@ const awesomeInput = (props) => {
             className={classes.HomeIcon}
             onClick={(e) => {
               e.preventDefault();
-              props.history.push('/');
+              const currentPath = props.history.location && props.history.location.pathname;
+              if (currentPath !== '/') {
+                props.history.push('/');
+              }
               props.homeOnClick('');
             }}
           />

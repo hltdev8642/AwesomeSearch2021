@@ -1,0 +1,104 @@
+.CollectionCard {
+  min-height: 180px;
+}
+
+.Stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.Stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.StatIcon {
+  color: #3498db;
+}
+
+.Preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.PreviewItem {
+  background: #f0f0f0;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  color: #555;
+}
+
+.MoreItems {
+  color: #999;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.Meta {
+  font-size: 0.8rem;
+  color: #999;
+  margin-top: auto;
+}
+
+.ActionButton {
+  background: none;
+  border: none;
+  padding: 6px 8px;
+  cursor: pointer;
+  color: #666;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.ActionButton:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.ActionButton.danger:hover {
+  background: #ffeaea;
+  color: #e74c3c;
+}
+
+/* Dark theme */
+:global(.solarized-dark) .Stat {
+  color: #657b83;
+}
+
+:global(.solarized-dark) .StatIcon {
+  color: #268bd2;
+}
+
+:global(.solarized-dark) .PreviewItem {
+  background: #002b36;
+  color: #839496;
+}
+
+:global(.solarized-dark) .MoreItems {
+  color: #586e75;
+}
+
+:global(.solarized-dark) .Meta {
+  color: #586e75;
+}
+
+:global(.solarized-dark) .ActionButton {
+  color: #657b83;
+}
+
+:global(.solarized-dark) .ActionButton:hover {
+  background: #002b36;
+  color: #93a1a1;
+}
+
+:global(.solarized-dark) .ActionButton.danger:hover {
+  background: rgba(220, 50, 47, 0.1);
+  color: #dc322f;
+}

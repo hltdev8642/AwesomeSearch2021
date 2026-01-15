@@ -1,5 +1,5 @@
 .AwesomeSearch {
-  max-width: 1024px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 10px;
   position: relative;
@@ -26,6 +26,66 @@
   z-index: 999;
 }
 
+/* Feature Navigation */
+.FeatureNav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: 1rem;
+  float: right;
+}
+
+.NavButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #888;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.NavButton:hover {
+  background: rgba(77, 171, 247, 0.1);
+  border-color: rgba(77, 171, 247, 0.3);
+  color: #4dabf7;
+}
+
+.NavButton.Active {
+  background: #4dabf7;
+  border-color: #4dabf7;
+  color: white;
+}
+
+/* Feature View Container */
+.FeatureView {
+  padding: 1rem 0;
+}
+
+.BackButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: #888;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.BackButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #e0e0e0;
+}
+
 @media (max-width: 768px) {
   .AwesomeSearch {
     width: 100%;
@@ -37,6 +97,26 @@
 
   .StarButton {
     display: none;
+  }
+
+  .FeatureNav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 0.5rem;
+    background: #1e1e1e;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    justify-content: space-around;
+    z-index: 100;
+    float: none;
+  }
+
+  .NavButton {
+    width: 44px;
+    height: 44px;
+    font-size: 1.1rem;
   }
 }
 

@@ -1,0 +1,146 @@
+/**
+ * AIRecommendations styles
+ */
+
+.AIRecommendations {
+  background: var(--card-bg, #1e1e1e);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.Header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.Title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.Title h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-primary, #e0e0e0);
+}
+
+.Icon {
+  color: var(--primary, #4dabf7);
+}
+
+.Notice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(77, 171, 247, 0.1);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: var(--text-secondary, #aaa);
+  margin-bottom: 1rem;
+}
+
+.Loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem;
+  color: var(--text-secondary, #aaa);
+}
+
+.Error {
+  padding: 0.75rem;
+  background: rgba(231, 76, 60, 0.1);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  border-radius: 4px;
+  color: #e74c3c;
+  font-size: 0.9rem;
+}
+
+.Results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.Recommendation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.Recommendation:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.RecInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.RecName {
+  display: block;
+  font-weight: 500;
+  color: var(--primary, #4dabf7);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.RecName:hover {
+  text-decoration: underline;
+}
+
+.RecReason {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary, #888);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.RecActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 0.5rem;
+}
+
+.ExternalLink,
+.AddButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary, #888);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.ExternalLink:hover,
+.AddButton:hover {
+  background: var(--primary, #4dabf7);
+  color: white;
+}
+
+.NoResults {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--text-secondary, #888);
+  font-size: 0.9rem;
+}

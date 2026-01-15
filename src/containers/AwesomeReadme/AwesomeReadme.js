@@ -9,6 +9,36 @@ import {
   faTimes,
 } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
+import DOMPurify from 'dompurify';
+
+// Simple lightweight markdown -> HTML fallback for raw README parsing
+const simpleMarkdownToHtml = (md) => {
+  if (!md) return '';
+  // Code fences
+  let html = md.replace(/```([\s\S]*?)```/g, (m, code) => {
+    return `<pre><code>${escapeHtml(code)}</code></pre>`;
+  });
+  // Headings
+  for (let i = 6; i >= 1; i--) {
+    const hashes = '#'.repeat(i);
+    const re = new RegExp(`^${hashes} (.*)$`, 'gm');
+    html = html.replace(re, `<h${i}>$1</h${i}>`);
+  }
+  // Links
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  // Inline code
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  // Basic paragraphs / line breaks
+  html = html.split(/\n\n+/).map(p => `<p>${p.replace(/\n/g, '<br/>')}</p>`).join('');
+  return html;
+};
+
+const escapeHtml = (str) => {
+  return (str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+};
 class AwesomeReadme extends Component {
   state = {
     _html: `<br/><b># Waiting for content loading...</b>`,
@@ -52,8 +82,54 @@ class AwesomeReadme extends Component {
           showReadmeInfo: true,
         });
       })
-      .catch((err) => {
-        switch (err.response.status) {
+      .catch(async (err) => {
+        // If API fails due to CORS or being blocked (err.response undefined) try fallback to raw GitHub README
+        const status = err?.response?.status;
+
+        const setNetworkError = (message) => {
+          this.setState({
+            _html: `<br/><b># Failed to load readme file: ${message}.</b>`,
+            showReadmeInfo: false,
+          });
+        };
+
+        if (!status) {
+          // Likely CORS or network blocked (ERR_BLOCKED_BY_CLIENT). Try raw.githubusercontent.com fallbacks
+          const branches = ['master', 'main'];
+          let fallbackHtml = null;
+
+          for (let branch of branches) {
+            try {
+              const rawUrl = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/README.md`;
+              const resRaw = await axios.get(rawUrl, { responseType: 'text' });
+              if (resRaw && resRaw.data) {
+                // Convert markdown to HTML and sanitize
+                const mdHtml = simpleMarkdownToHtml(resRaw.data || '');
+                const clean = DOMPurify.sanitize(mdHtml);
+                fallbackHtml = this.fixImage({ user, repo, res: { data: clean } });
+                break;
+              }
+            } catch (rawErr) {
+              // continue to next branch
+            }
+          }
+
+          if (fallbackHtml) {
+            this.setState({ _html: fallbackHtml, user, repo, showReadmeInfo: true });
+            return;
+          }
+
+          // If still failed, provide a helpful message for blocked requests
+          const blockedMsg = err.message && err.message.includes('ERR_BLOCKED_BY_CLIENT')
+            ? 'Request blocked by browser extension (adblocker). Try disabling extensions for this site.'
+            : err.message || 'Network error (CORS or blocked request)';
+
+          setNetworkError(blockedMsg);
+          return;
+        }
+
+        // Handle known HTTP statuses
+        switch (status) {
           case 403:
             this.setState({
               _html: `<br/><b># Github API rate limit exceeds...</b>
@@ -68,19 +144,18 @@ class AwesomeReadme extends Component {
             break;
           default:
             this.setState({
-              _html: `<br/><b># Failed to load readme file with ${err.message}.</b><br/><br/>
+              _html: `<br/><b># Failed to load readme file: ${err.message || 'Network error'}.</b><br/><br/>
                       # How to resolve?
                       <ol>
                         <li> The repo you are looking for does not exist. Please click the home icon on the top left to back to home page.</li>
                         <li> Sorry, you may access us from old Awesome Search...Please re-search this repo and bookmark it.</li>
-                      </ol> 
-                      <div style="width:100%;height:0;padding-bottom:53%;position:relative;"><iframe src="https://giphy.com/embed/zyclIRxMwlY40" width="100%" height="100%" style="position:absolute" frameBorder="0" class="giphy-embed" allowFullScreen></iframe></div><p><a href="https://giphy.com/gifs/fire-richard-ayoade-the-it-crowd-zyclIRxMwlY40">via GIPHY</a></p>
-                      `,
+                      </ol>`,
               showReadmeInfo: false,
             });
             break;
         }
       });
+
 
     axios
       .get(`https://api.github.com/repos/${user}/${repo}`, {

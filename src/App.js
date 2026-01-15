@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import AwesomeSearch from './containers/AwesomeSearch/AwesomeSearch';
 import { HashRouter } from 'react-router-dom';
+import { CollectionsProvider } from './context/CollectionsContext';
+import { ListManagementProvider } from './context/ListManagementContext';
 import './App.css';
 
 function App() {
@@ -9,9 +11,13 @@ function App() {
 
   return (
     <HashRouter>
-      <div className={`hack${theme}`}>
-        <AwesomeSearch onThemeChange={setIsDark} isDark={isDark} theme={isDark ? 'dark-theme': 'normal-theme'} />
-      </div>
+      <CollectionsProvider>
+        <ListManagementProvider>
+          <div className={`hack${theme}`}>
+            <AwesomeSearch onThemeChange={setIsDark} isDark={isDark} theme={isDark ? 'dark-theme': 'normal-theme'} />
+          </div>
+        </ListManagementProvider>
+      </CollectionsProvider>
     </HashRouter>
   );
 }

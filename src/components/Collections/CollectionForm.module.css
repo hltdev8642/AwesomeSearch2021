@@ -1,0 +1,123 @@
+.CollectionForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.FormGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.Label {
+  font-weight: 500;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.Input,
+.Textarea {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.Input:focus,
+.Textarea:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.Textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.ColorPicker {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ColorOption {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ColorOption:hover {
+  transform: scale(1.1);
+}
+
+.ColorOption.selected {
+  border-color: #333;
+  box-shadow: 0 0 0 2px white, 0 0 0 4px #333;
+}
+
+.FormActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.Errors {
+  background: #ffeaea;
+  border: 1px solid #e74c3c;
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.Error {
+  color: #c0392b;
+  font-size: 0.9rem;
+}
+
+.Error + .Error {
+  margin-top: 4px;
+}
+
+/* Dark theme */
+:global(.solarized-dark) .Label {
+  color: #93a1a1;
+}
+
+:global(.solarized-dark) .Input,
+:global(.solarized-dark) .Textarea {
+  background: #073642;
+  border-color: #586e75;
+  color: #839496;
+}
+
+:global(.solarized-dark) .Input::placeholder,
+:global(.solarized-dark) .Textarea::placeholder {
+  color: #657b83;
+}
+
+:global(.solarized-dark) .Input:focus,
+:global(.solarized-dark) .Textarea:focus {
+  border-color: #268bd2;
+  box-shadow: 0 0 0 3px rgba(38, 139, 210, 0.1);
+}
+
+:global(.solarized-dark) .ColorOption.selected {
+  border-color: #93a1a1;
+  box-shadow: 0 0 0 2px #002b36, 0 0 0 4px #93a1a1;
+}
+
+:global(.solarized-dark) .Errors {
+  background: rgba(220, 50, 47, 0.1);
+  border-color: #dc322f;
+}
+
+:global(.solarized-dark) .Error {
+  color: #dc322f;
+}

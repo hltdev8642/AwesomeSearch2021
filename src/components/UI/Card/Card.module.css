@@ -1,0 +1,81 @@
+.Card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.hoverable:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.selected {
+  box-shadow: 0 0 0 2px #3498db;
+}
+
+.CardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.CardTitles {
+  flex: 1;
+  min-width: 0;
+}
+
+.CardTitle {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.CardSubtitle {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.CardActions {
+  display: flex;
+  gap: 8px;
+  margin-left: 12px;
+}
+
+.CardBody {
+  padding: 16px;
+}
+
+/* Dark theme */
+:global(.solarized-dark) .Card {
+  background: #073642;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+:global(.solarized-dark) .CardHeader {
+  border-bottom-color: #002b36;
+}
+
+:global(.solarized-dark) .CardTitle {
+  color: #93a1a1;
+}
+
+:global(.solarized-dark) .CardSubtitle {
+  color: #657b83;
+}
+
+:global(.solarized-dark) .selected {
+  box-shadow: 0 0 0 2px #268bd2;
+}
