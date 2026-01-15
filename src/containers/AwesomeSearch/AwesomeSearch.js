@@ -21,6 +21,7 @@ import { AIRecommendations } from '../../components/AI';
 import { SettingsPanel } from '../../components/Settings';
 import { ExportModal, ImportModal } from '../../components/ImportExport';
 import CollectionsContext from '../../context/CollectionsContext';
+import storageService from '../../services/storageService';
 
 class AwesomeSearch extends Component {
     static contextType = CollectionsContext;
@@ -50,6 +51,9 @@ class AwesomeSearch extends Component {
                 this.setState({
                     subjects: subjects.data,
                     errorMessage: '',
+                }, () => {
+                    // Merge custom lists (if any) and update subjectsArray accordingly
+                    this.mergeCustomLists();
                 });
 
                 let subjectsArray = Object.keys(subjects.data)
@@ -78,6 +82,14 @@ class AwesomeSearch extends Component {
 
     componentDidMount() {
         this.getSubjectEntries();
+        // Listen for custom list or list config updates
+        window.addEventListener('customListsUpdated', this.handleCustomListsUpdated);
+        window.addEventListener('listConfigUpdated', this.handleListConfigUpdated);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('customListsUpdated', this.handleCustomListsUpdated);
+        window.removeEventListener('listConfigUpdated', this.handleListConfigUpdated);
     }
 
     topicOnClickHandler = (topic) => {
@@ -143,6 +155,68 @@ class AwesomeSearch extends Component {
         // This will be called from AIRecommendations to add items to a collection
         console.log('Add to collection:', item);
         // The actual logic is handled by the CollectionsContext
+    };
+
+    // Merge custom lists from storage into subjects and subjectsArray
+    mergeCustomLists = () => {
+        const customLists = storageService.getCustomLists() || [];
+        const currentSubjects = this.state.subjects || {};
+
+        // Build a flat set of existing repos to avoid duplicates
+        const existingRepos = new Set();
+        Object.keys(currentSubjects).forEach((key) => {
+            currentSubjects[key].forEach(item => existingRepos.add(item.repo));
+        });
+
+        // Map custom lists into the same shape as subject entries
+        const mappedCustom = customLists.map(l => {
+            const repo = l.repo;
+            const name = l.name || (repo && repo.split('/')[1]) || repo;
+            const user = l.user || (repo && repo.split('/')[0]) || '';
+            return {
+                name,
+                repo,
+                description: l.description || '',
+                user,
+                cate: 'Custom',
+            };
+        }).filter(item => item.repo && !existingRepos.has(item.repo));
+
+        // If there are no custom lists and no Custom subject, nothing to do
+        if (mappedCustom.length === 0 && !currentSubjects.Custom) {
+            // However we still need to apply enabled filtering
+            const flattened = Object.keys(currentSubjects)
+                .map(k => currentSubjects[k])
+                .reduce((a, b) => a.concat(b), []);
+
+            const enabledOnly = flattened.filter(it => storageService.isListEnabled(it.repo));
+            this.setState({ subjectsArray: enabledOnly });
+            return;
+        }
+
+        // Merge into subjects under 'Custom'
+        const newSubjects = {
+            ...currentSubjects,
+            Custom: [...(currentSubjects.Custom || []), ...mappedCustom],
+        };
+
+        // Flatten and apply enabled filter
+        const flattened = Object.keys(newSubjects)
+            .map(k => newSubjects[k])
+            .reduce((a, b) => a.concat(b), []);
+
+        const enabledOnly = flattened.filter(it => storageService.isListEnabled(it.repo));
+
+        this.setState({ subjects: newSubjects, subjectsArray: enabledOnly });
+    };
+
+    handleCustomListsUpdated = () => {
+        this.mergeCustomLists();
+    };
+
+    handleListConfigUpdated = () => {
+        // Recompute subjectsArray enabled filter
+        this.mergeCustomLists();
     };
 
     render() {

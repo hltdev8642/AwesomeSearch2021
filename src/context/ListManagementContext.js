@@ -137,14 +137,17 @@ export function ListManagementProvider({ children }) {
   const actions = {
     toggleList: (repo) => {
       dispatch({ type: ACTIONS.TOGGLE_LIST, payload: repo });
+      try { window.dispatchEvent(new CustomEvent('listConfigUpdated', { detail: { action: 'toggle', repo } })); } catch (e) {}
     },
 
     enableAll: () => {
       dispatch({ type: ACTIONS.ENABLE_ALL });
+      try { window.dispatchEvent(new CustomEvent('listConfigUpdated', { detail: { action: 'enableAll' } })); } catch (e) {}
     },
 
     disableAll: (allRepos) => {
       dispatch({ type: ACTIONS.DISABLE_ALL, payload: allRepos });
+      try { window.dispatchEvent(new CustomEvent('listConfigUpdated', { detail: { action: 'disableAll' } })); } catch (e) {}
     },
 
     isListEnabled: (repo) => {
@@ -153,6 +156,8 @@ export function ListManagementProvider({ children }) {
 
     addCustomList: (list) => {
       dispatch({ type: ACTIONS.ADD_CUSTOM_LIST, payload: list });
+      // Notify app that custom lists changed
+      try { window.dispatchEvent(new CustomEvent('customListsUpdated', { detail: list })); } catch (e) {}
     },
 
     removeCustomList: (repo) => {
