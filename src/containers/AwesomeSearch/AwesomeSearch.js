@@ -56,15 +56,7 @@ class AwesomeSearch extends Component {
                     this.mergeCustomLists();
                 });
 
-                let subjectsArray = Object.keys(subjects.data)
-                    .map((subject) => {
-                        return subjects.data[subject];
-                    })
-                    .reduce((arr, el) => {
-                        return arr.concat(el);
-                    }, []);
 
-                this.setState({subjectsArray: subjectsArray});
 
                 if (!this.state.subjects) {
                     this.setState({
@@ -97,16 +89,21 @@ class AwesomeSearch extends Component {
     };
 
     searchInputOnChangeHandler = (event) => {
+        const q = event.target.value;
         this.setState({
-            search: event.target.value,
+            search: q,
         });
 
         const options = {
-            keys: ['name'],
+            keys: ['name', 'repo', 'description', 'cate'],
+            threshold: 0.4,
+            includeScore: true,
+            ignoreLocation: true,
         };
 
-        const fuse = new Fuse(this.state.subjectsArray, options);
-        const result = fuse.search(event.target.value);
+        // Recreate fuse index from current subjectsArray (which includes custom lists via merge)
+        const fuse = new Fuse(this.state.subjectsArray || [], options);
+        const result = q.trim() ? fuse.search(q) : [];
 
         this.setState({searchResult: result.slice(0, 20)});
     };
@@ -212,11 +209,19 @@ class AwesomeSearch extends Component {
 
     handleCustomListsUpdated = () => {
         this.mergeCustomLists();
+        // If user has an active search, re-run it to include new items
+        if (this.state.search && this.state.search.trim()) {
+            this.searchInputOnChangeHandler({ target: { value: this.state.search } });
+        }
     };
 
     handleListConfigUpdated = () => {
         // Recompute subjectsArray enabled filter
         this.mergeCustomLists();
+        // Re-run current search to reflect enabled/disabled changes
+        if (this.state.search && this.state.search.trim()) {
+            this.searchInputOnChangeHandler({ target: { value: this.state.search } });
+        }
     };
 
     render() {
