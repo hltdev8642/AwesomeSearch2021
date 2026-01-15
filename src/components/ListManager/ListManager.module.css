@@ -78,6 +78,60 @@
   padding: 1rem;
 }
 
+.GitHubSearch {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(255,255,255,0.02);
+  border-radius: 8px;
+}
+
+.GitHubHeader {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:1rem;
+}
+
+.GitHubControls {
+  display:flex;
+  gap:0.5rem;
+  align-items:center;
+}
+
+.GitHubInput {
+  padding:0.5rem 0.75rem;
+  border-radius:4px;
+  background: rgba(0,0,0,0.3);
+  border:1px solid rgba(255,255,255,0.06);
+  color:var(--text-primary,#e0e0e0);
+}
+
+.GhLoading, .GhError {
+  margin-top:0.75rem;
+  color:var(--text-secondary,#888);
+}
+
+.GhResults {
+  margin-top:0.75rem;
+  display:flex;
+  flex-direction:column;
+  gap:0.5rem;
+}
+
+.GhRow {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0.5rem;
+  background: rgba(255,255,255,0.02);
+  border-radius:6px;
+}
+
+.GhInfo { flex:1; min-width:0; }
+.GhDesc { color:var(--text-secondary,#888); font-size:0.9rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+.GhActions { margin-left:0.5rem }
+.GhPager { display:flex; align-items:center; gap:0.5rem; margin-top:0.5rem; justify-content:center }
+
 .AddInput {
   flex: 1;
   padding: 0.75rem 1rem;

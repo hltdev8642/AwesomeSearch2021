@@ -5,6 +5,7 @@ import React, { useState, useMemo } from 'react';
 import { useListManagement } from '../../context/ListManagementContext';
 import { Toggle, Button, Card, Tabs } from '../UI';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import githubService from '../../services/githubService';
 import { 
   faList, 
   faStar,
@@ -124,6 +125,52 @@ const ListManager = ({ allLists = [], onRefresh }) => {
 
   const getListId = (list) => list.repo || `${list.user}/${list.name}`;
 
+  // GitHub search state
+  const [ghQuery, setGhQuery] = useState('');
+  const [ghResults, setGhResults] = useState([]);
+  const [ghLoading, setGhLoading] = useState(false);
+  const [ghError, setGhError] = useState(null);
+  const [ghPage, setGhPage] = useState(1);
+  const [ghHasMore, setGhHasMore] = useState(false);
+
+  // Debounced search effect
+  React.useEffect(() => {
+    if (!ghQuery.trim()) {
+      setGhResults([]);
+      setGhError(null);
+      return;
+    }
+    const t = setTimeout(() => performGhSearch(ghPage), 450);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ghQuery, ghPage]);
+
+  const performGhSearch = async (page = 1) => {
+    setGhLoading(true);
+    setGhError(null);
+    try {
+      const res = await githubService.searchAwesomeLists(ghQuery, { page, perPage: 10 });
+      setGhResults(res.items || []);
+      setGhHasMore(res.hasMore || false);
+      setGhPage(page);
+    } catch (err) {
+      setGhError('GitHub search failed. Try again later.');
+    } finally {
+      setGhLoading(false);
+    }
+  };
+
+  const addGhAsCustom = (item) => {
+    if (!item || !item.repo) return;
+    const exists = (customLists || []).some(l => l.repo === item.repo);
+    if (exists) {
+      setGhError('Already added');
+      setTimeout(() => setGhError(null), 1500);
+      return;
+    }
+    addCustomList({ repo: item.repo, name: item.name, user: item.fullName.split('/')[0], description: item.description, isCustom: true });
+  };
+
   return (
     <div className={classes.ListManager}>
       <div className={classes.Header}>
@@ -177,6 +224,52 @@ const ListManager = ({ allLists = [], onRefresh }) => {
           </Button>
         </Card>
       )}
+
+      {/* GitHub topic search for awesome lists */}
+      <div className={classes.GitHubSearch}>
+        <div className={classes.GitHubHeader}>
+          <h3>Find Awesome Lists on GitHub</h3>
+          <div className={classes.GitHubControls}>
+            <input
+              type="text"
+              placeholder="Search GitHub (topic:awesome)"
+              value={ghQuery}
+              onChange={(e) => { setGhQuery(e.target.value); setGhPage(1); }}
+              className={classes.GitHubInput}
+            />
+            <Button size="small" onClick={() => performGhSearch(1)}>
+              Search
+            </Button>
+          </div>
+        </div>
+
+        {ghLoading && <div className={classes.GhLoading}>Searching GitHub…</div>}
+        {ghError && <div className={classes.GhError}>{ghError}</div>}
+
+        {ghResults.length > 0 && (
+          <div className={classes.GhResults}>
+            {ghResults.map(item => (
+              <div key={item.id} className={classes.GhRow}>
+                <div className={classes.GhInfo}>
+                  <a href={item.url} target="_blank" rel="noopener noreferrer">{item.fullName}</a>
+                  <div className={classes.GhDesc}>{item.description}</div>
+                </div>
+                <div className={classes.GhActions}>
+                  <Button size="small" variant="secondary" onClick={() => addGhAsCustom(item)}>
+                    Add
+                  </Button>
+                </div>
+              </div>
+            ))}
+
+            <div className={classes.GhPager}>
+              <Button size="small" onClick={() => performGhSearch(Math.max(1, ghPage - 1))} disabled={ghPage === 1}>Prev</Button>
+              <span>Page {ghPage}</span>
+              <Button size="small" onClick={() => performGhSearch(ghPage + 1)} disabled={!ghHasMore}>Next</Button>
+            </div>
+          </div>
+        )}
+      </div>
 
       <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
